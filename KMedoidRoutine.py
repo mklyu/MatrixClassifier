@@ -87,7 +87,7 @@ class KMedoidRoutine:
 
 
 if __name__ == "__main__":
-    dataset = Dataset(DATA_DIR, trimFirst=100)
+    dataset = Dataset(DATA_DIR, trimFirst=10)
     dataset.Load()
 
     metric = MatrixNormDifference(normType="frobenius")
@@ -103,3 +103,5 @@ if __name__ == "__main__":
 
     clusters = kmedoid.GetClusters()
     print(f"Generated {len(clusters)} clusters.")
+
+    print(f"Cluster 1: {clusters[0].__len__()}")
