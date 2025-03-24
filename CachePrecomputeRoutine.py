@@ -1,8 +1,12 @@
 from Module.Dataset import Dataset
 from Module.Metrics import MatrixNormDifference, CachedMetric
+from concurrent.futures import ThreadPoolExecutor
+import threading
+from tqdm import tqdm
 
 DATA_DIR = "./cifar-10-batches-py"
 CACHE_FILE = "./distance_cache.pkl"
+WORKER_COUNT = 12
 
 
 class CachePrecomputeRoutine:
@@ -16,6 +20,15 @@ class CachePrecomputeRoutine:
         self.dataset = dataset
         self.metricCache = CachedMetric(metric)
         self.cache_file = cache_file
+        self.lock = threading.Lock()  # For thread-safe cache access
+
+    def CalculateDistance(self, idx1, idx2):
+        """Calculate distance between two images and cache the result."""
+        img1, _ = self.dataset[idx1]
+        img2, _ = self.dataset[idx2]
+
+        with self.lock:  # Ensure that cache writing is thread-safe
+            self.metricCache.Calculate(img1, img2, idx1, idx2)
 
     def Run(self):
         if len(self.dataset) == 0:
@@ -24,22 +37,22 @@ class CachePrecomputeRoutine:
 
         print("Precomputing distances...")
 
-        for iterIndexImageIn in range(self.dataset.__len__()):
-            imgIn, _ = self.dataset[iterIndexImageIn]
+        # Initialize a list to hold the future tasks
+        futures = []
 
-            for iterIndexImageOut in range(
-                self.dataset.__len__()
-            ):  # Compute for all pairs
-                
-                if iterIndexImageIn == iterIndexImageOut:
-                    continue  # Skip the same image comparison
+        # Use ThreadPoolExecutor for parallel processing
+        with ThreadPoolExecutor(max_workers=WORKER_COUNT) as executor:
+            # Use tqdm to show a progress bar over the pairs
+            total_pairs = len(self.dataset) * (len(self.dataset) - 1) // 2  # Total unique pairs
+            with tqdm(total=total_pairs, desc="Precomputing distances", ncols=100) as pbar:
+                for iterIndexImageIn in range(len(self.dataset)):
+                    for iterIndexImageOut in range(iterIndexImageIn + 1, len(self.dataset)):  # Avoid redundant pairs
+                        futures.append(executor.submit(self.CalculateDistance, iterIndexImageIn, iterIndexImageOut))
+                        pbar.update(1)  # Update the progress bar
 
-                imgOut, _ = self.dataset[iterIndexImageOut]
-
-                # Compute and cache the distance
-                self.metricCache.Calculate(
-                    imgIn, imgOut, iterIndexImageIn, iterIndexImageOut
-                )
+                # Wait for all futures to complete
+                for future in futures:
+                    future.result()  # Blocks until the future is done
 
         # Save cache to file
         self.metricCache.ToPickle(self.cache_file)
