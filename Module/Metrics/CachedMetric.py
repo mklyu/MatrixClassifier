@@ -61,7 +61,3 @@ class CachedMetric(IImageMetric):
         """Loads cached distances from a file."""
         with open(file_path, "rb") as f:
             self.cache = pickle.load(f)
-
-    def CacheContent(self):
-        """Returns the current cache."""
-        return self.cache
