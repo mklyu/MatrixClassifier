@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "${workspaceFolder}/VisualizerRoutine.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Metric Visualizer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/VisualizeMetricRoutine.py",
+            "console": "integratedTerminal"
         }
     ]
 }
