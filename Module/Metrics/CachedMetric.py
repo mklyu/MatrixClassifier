@@ -1,5 +1,5 @@
-from Module.Metrics import IImageMetric
-import numpy as np
+import pickle
+from .IImageMetric import IImageMetric
 
 
 class CachedMetric(IImageMetric):
@@ -7,7 +7,6 @@ class CachedMetric(IImageMetric):
         """
         Args:
             metric: The base metric to use (should implement IImageMetric).
-            dataset_size: Total number of images in the dataset (used for cache size).
         """
         self.metric = metric
         self.cache = {}  # Stores (idx1, idx2) -> distance
@@ -36,3 +35,13 @@ class CachedMetric(IImageMetric):
             self.cache[key] = distance
 
         return distance
+
+    def ToPickle(self, file_path):
+        """Saves the cached distances to a file."""
+        with open(file_path, "wb") as f:
+            pickle.dump(self.cache, f)
+
+    def FromPickle(self, file_path):
+        """Loads cached distances from a file."""
+        with open(file_path, "rb") as f:
+            self.cache = pickle.load(f)
