@@ -1,6 +1,6 @@
 import random
 from Module.Dataset import Dataset
-from Module.Metrics import IImageMetric, MatrixNormDifference
+from Module.Metrics import IImageMetric, MatrixNormDifference, CachedMetric
 
 # Global settings
 K = 3  # Number of clusters
@@ -19,6 +19,7 @@ class KMedoidRoutine:
         self.metric: IImageMetric = metric
         self.data = [img for img, _ in self.dataset]  # Load all images
         self.numSamples = len(self.data)
+
         self.medoids = random.sample(self.data, K)  # Pick initial K medoids
 
     def Run(self):
@@ -26,29 +27,30 @@ class KMedoidRoutine:
             print("Dataset not loaded. Call Load() first.")
             return
 
-        for iteration in range(CLASSIF_ITERS):
-            print(f"Iteration {iteration+1}/{CLASSIF_ITERS}")
+        for classifierIter in range(CLASSIF_ITERS):
+            print(f"Iteration {classifierIter+1}/{CLASSIF_ITERS}")
 
             # Assign each image to the closest medoid
             clusters = {medoid: [] for medoid in self.medoids}
-            for img in self.data:
-                closest_medoid = min(self.medoids, key=lambda medoid: self.metric.Calculate(img, medoid))
-                clusters[closest_medoid].append(img)
+
+            for iterImage in self.data:
+                closestMedoid = min(self.medoids, key=lambda medoid: self.metric.Calculate(iterImage, medoid))
+                clusters[closestMedoid].append(iterImage)
 
             # Update medoids to be the most central image in each cluster
-            new_medoids = []
-            for medoid, cluster in clusters.items():
-                new_medoid = min(cluster, key=lambda img: sum(self.metric.Calculate(img, other) for other in cluster))
-                new_medoids.append(new_medoid)
+            newMedoids = []
+            for iterMedoid, iterCluster in clusters.items():
+                newMedoid = min(iterCluster, key=lambda img: sum(self.metric.Calculate(img, other) for other in iterCluster))
+                newMedoids.append(newMedoid)
 
             # Stop if medoids did not change
-            if set(map(id, new_medoids)) == set(map(id, self.medoids)):
-                print("Converged early!")
+            if set(map(id, newMedoids)) == set(map(id, self.medoids)):
+                print("Converged early")
                 break
 
-            self.medoids = new_medoids
+            self.medoids = newMedoids
 
-        print("Clustering complete!")
+        print("Clustering complete")
 
     def GetClusters(self):
         """Returns the final cluster assignments."""
@@ -64,9 +66,10 @@ if __name__ == "__main__":
     dataset.Load()
 
     metric = MatrixNormDifference(normType="frobenius")
+    metricCache = CachedMetric(metric)
 
     # Run K-Medoid Clustering
-    kmedoid = KMedoidRoutine(dataset, metric)
+    kmedoid = KMedoidRoutine(dataset, metricCache)
     kmedoid.Run()
 
     clusters = kmedoid.GetClusters()
