@@ -1,7 +1,7 @@
 Please download CIFAR-10 dataset from:
 https://www.cs.toronto.edu/~kriz/cifar.html
 
-Download the python version.
+Download the python version dataset.
 
 Extract cifar-10-batches-py from the compressed folder inside project directory
 
@@ -17,9 +17,9 @@ Quick exection:
 
 Execution scripts:
 
-> VisualizerRoutine: see if the dataset is loaded
+> VisualizerRoutine: visualize data for a sanity check.
 
-> VisualizeMetricRoutine: visualize the matrix norm distance used
+> VisualizeMetricRoutine: visualize the matrix norm distance used.
 
 > CachePrecomputeRoutine: precompute the distance cache map for the dataset ,distance_cache.pkl will be exported. Only needed if dataset is trimmed to be larger than defaut.
 
