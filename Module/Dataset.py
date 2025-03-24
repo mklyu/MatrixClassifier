@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 import pickle
 
 import numpy as np
@@ -8,11 +8,17 @@ from torch.utils.data import Dataset
 
 
 class Dataset(Dataset):
-    def __init__(self, dataDir: str, loadBatches=["data_batch_1"]):
+    def __init__(
+        self,
+        dataDir: str,
+        loadBatches=["data_batch_1"],
+        trimFirst: Optional[int] = None,
+    ):
         assert isinstance(dataDir, str)
 
         self.dataDir = dataDir
         self._loadBatches = loadBatches
+        self._trimFirst = trimFirst
 
         self._data: List = []
         self._labels: List = []
@@ -37,6 +43,11 @@ class Dataset(Dataset):
             torch.tensor(data, dtype=torch.float32).reshape(-1, 3, 32, 32) / 255.0
         )
         self._labels = torch.tensor(labels, dtype=torch.long)
+
+        # If trimFirst is specified, trim the dataset
+        if self._trimFirst is not None and isinstance(self._trimFirst, int):
+            self._data = self._data[:self._trimFirst]
+            self._labels = self._labels[:self._trimFirst]
 
     def _Unpickle(self, file):
         with open(file, "rb") as fo:
