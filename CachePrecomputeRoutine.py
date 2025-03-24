@@ -1,5 +1,5 @@
 from Module.Dataset import Dataset
-from Module.Metrics import MatrixNormDifference,CachedMetric
+from Module.Metrics import MatrixNormDifference, CachedMetric
 
 DATA_DIR = "./cifar-10-batches-py"
 CACHE_FILE = "./distance_cache.pkl"
@@ -14,7 +14,7 @@ class CachePrecomputeRoutine:
             cache_file: Path to save the computed cache.
         """
         self.dataset = dataset
-        self.cached_metric = CachedMetric(metric)
+        self.metricCache = CachedMetric(metric)
         self.cache_file = cache_file
 
     def Run(self):
@@ -24,17 +24,25 @@ class CachePrecomputeRoutine:
 
         print("Precomputing distances...")
 
-        for i in range(len(self.dataset)):
-            img1, _ = self.dataset[i]
+        for iterIndexImageIn in range(self.dataset.__len__()):
+            imgIn, _ = self.dataset[iterIndexImageIn]
 
-            for j in range(i + 1, len(self.dataset)):  # Compute for all pairs
-                img2, _ = self.dataset[j]
+            for iterIndexImageOut in range(
+                self.dataset.__len__()
+            ):  # Compute for all pairs
+                
+                if iterIndexImageIn == iterIndexImageOut:
+                    continue  # Skip the same image comparison
+
+                imgOut, _ = self.dataset[iterIndexImageOut]
 
                 # Compute and cache the distance
-                self.cached_metric.Calculate(img1, img2, i, j)
+                self.metricCache.Calculate(
+                    imgIn, imgOut, iterIndexImageIn, iterIndexImageOut
+                )
 
         # Save cache to file
-        self.cached_metric.ToPickle(self.cache_file)
+        self.metricCache.ToPickle(self.cache_file)
         print(f"Cache saved to {self.cache_file}")
 
 
