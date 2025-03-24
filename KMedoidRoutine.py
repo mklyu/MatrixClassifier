@@ -1,5 +1,4 @@
 import random
-import torch
 import matplotlib.pyplot as plt
 from Module.Dataset import Dataset
 from Module.Metrics import IImageMetric, MatrixNormDifference, CachedMetric
