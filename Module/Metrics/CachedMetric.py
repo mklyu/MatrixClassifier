@@ -22,8 +22,10 @@ class CachedMetric(IImageMetric):
         Returns:
             Cached or computed distance.
         """
+        # Ensure that the indices are order-independent for the cache
         if idx1 is not None and idx2 is not None:
-            key = (min(idx1, idx2), max(idx1, idx2))  # Ensure consistent key order
+            # Using sorted indices to ensure the key order does not matter
+            key = tuple(sorted((idx1, idx2)))  # Same key for both (idx1, idx2) and (idx2, idx1)
             if key in self.cache:
                 return self.cache[key]
 
