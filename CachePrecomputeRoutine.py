@@ -47,7 +47,7 @@ class CachePrecomputeRoutine:
 
 
 if __name__ == "__main__":
-    dataset = Dataset(DATA_DIR)
+    dataset = Dataset(DATA_DIR, trimFirst=100)
     dataset.Load()
 
     metric = MatrixNormDifference(normType="frobenius")

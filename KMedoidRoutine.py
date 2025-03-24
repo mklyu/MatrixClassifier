@@ -6,6 +6,7 @@ from Module.Metrics import IImageMetric, MatrixNormDifference, CachedMetric
 K = 3  # Number of clusters
 CLASSIF_ITERS = 10  # Number of iterations for clustering
 DATA_DIR = "./cifar-10-batches-py"
+CACHE_FILE = "./distance_cache.pkl"
 
 
 class KMedoidRoutine:
@@ -62,11 +63,12 @@ class KMedoidRoutine:
 
 
 if __name__ == "__main__":
-    dataset = Dataset(DATA_DIR)
+    dataset = Dataset(DATA_DIR,trimFirst=100)
     dataset.Load()
 
     metric = MatrixNormDifference(normType="frobenius")
     metricCache = CachedMetric(metric)
+    metricCache.FromPickle(CACHE_FILE)
 
     # Run K-Medoid Clustering
     kmedoid = KMedoidRoutine(dataset, metricCache)

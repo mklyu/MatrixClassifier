@@ -24,6 +24,13 @@
             "request": "launch",
             "program": "${workspaceFolder}/CachePrecomputeRoutine.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Classify",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/KMedoidRoutine.py",
+            "console": "integratedTerminal"
         }
     ]
 }
