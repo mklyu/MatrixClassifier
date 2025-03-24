@@ -31,7 +31,7 @@ class KMedoidRoutine:
             return
 
         for classifierIter in range(CLASSIF_ITERS):
-            print(f"Iteration {classifierIter+1}/{CLASSIF_ITERS}")
+            print(f"Iteration {classifierIter + 1}/{CLASSIF_ITERS}")
 
             # Assign each image to the closest medoid
             clusters = {medoid: [] for medoid in self.medoids}
@@ -64,9 +64,9 @@ class KMedoidRoutine:
         return clusters
 
     def VisualizeClusters(self):
-        """Visualize medoids and their closest 3 images."""
+        """Visualize medoids and their closest and farthest images."""
         clusters = self.GetClusters()
-        fig, axes = plt.subplots(K, 4, figsize=(12, 12))
+        fig, axes = plt.subplots(K, 7, figsize=(14, 12))  # 7 columns: medoid + 3 closest + 3 farthest
         
         for i, (medoid, images) in enumerate(clusters.items()):
             # Plot the medoid
@@ -81,9 +81,26 @@ class KMedoidRoutine:
                 ax = axes[i, j + 1]
                 ax.imshow(img.permute(1, 2, 0).numpy())
                 ax.axis('off')
+            
+            # Plot the 3 farthest images
+            farthest_images = sorted(images, key=lambda img: self.metric.Calculate(medoid, img), reverse=True)[:3]
+            for j, img in enumerate(farthest_images):
+                ax = axes[i, j + 4]
+                ax.imshow(img.permute(1, 2, 0).numpy())
+                ax.axis('off')
 
         plt.tight_layout()
         plt.show()
+
+    def PrintClusterSizes(self):
+        """Print the size and relative size of each cluster."""
+        clusters = self.GetClusters()
+        total_samples = len(self.data)
+
+        for i, (medoid, cluster) in enumerate(clusters.items()):
+            cluster_size = len(cluster)
+            relative_size = cluster_size / total_samples * 100  # Percentage
+            print(f"Cluster {i + 1} (Medoid {i + 1}) size: {cluster_size} ({relative_size:.2f}%)")
 
 
 if __name__ == "__main__":
@@ -98,10 +115,8 @@ if __name__ == "__main__":
     kmedoid = KMedoidRoutine(dataset, metricCache)
     kmedoid.Run()
 
-    # Visualize the medoids and their 3 closest images
+    # Visualize the medoids and their closest and farthest images
     kmedoid.VisualizeClusters()
 
-    clusters = kmedoid.GetClusters()
-    print(f"Generated {len(clusters)} clusters.")
-
-    print(f"Cluster 1: {clusters[0].__len__()}")
+    # Print cluster sizes and their relative sizes
+    kmedoid.PrintClusterSizes()
