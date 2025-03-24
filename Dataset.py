@@ -7,10 +7,11 @@ from torch.utils.data import Dataset
 
 
 class Dataset(Dataset):
-    def __init__(self, dataDir: str):
+    def __init__(self, dataDir: str, loadBatches=["data_batch_1"]):
         assert isinstance(dataDir, str)
 
         self.dataDir = dataDir
+        self._loadBatches = loadBatches
 
         self._data: List = []
         self._labels: List = []
@@ -23,7 +24,7 @@ class Dataset(Dataset):
             raise FileNotFoundError(f"Folder {self.dataDir} not found")
 
         for file in os.listdir(self.dataDir):
-            if file.startswith("data_batch") or file.startswith("test_batch"):
+            if file in self._loadBatches:
                 batch = self._Unpickle(os.path.join(self.dataDir, file))
                 data.extend(batch[b"data"])
                 labels.extend(batch[b"labels"])
@@ -33,7 +34,7 @@ class Dataset(Dataset):
         )
         self._labels = torch.tensor(labels, dtype=torch.long)
 
-    def _Unpickle(self,file):
+    def _Unpickle(self, file):
         with open(file, "rb") as fo:
             data = pickle.load(fo, encoding="bytes")
         return data
