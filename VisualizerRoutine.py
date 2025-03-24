@@ -31,6 +31,6 @@ if __name__ == "__main__":
     dataset = Dataset(DATA_DIR)
     print(f"Loading..")
     dataset.Load()
-    print(f"Press any key to cycle images <<<")
+    print(f"Press any key to cycle images >>>")
     visualizer = VisualizerRoutine(dataset)
     visualizer.Run()
