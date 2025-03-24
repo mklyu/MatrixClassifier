@@ -59,7 +59,7 @@ class VisualizeMetricRoutine:
         axes[0].hist(distances, bins=20, color="blue", edgecolor="black")
         axes[0].set_title("Histogram of Image Distances")
         axes[0].set_xlabel("Distance")
-        axes[0].set_ylabel("Frequency")
+        axes[0].set_ylabel("Images")
         axes[0].grid(True)
 
         # Display Reference, Closest, and Farthest images

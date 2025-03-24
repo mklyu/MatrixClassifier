@@ -1,7 +1,5 @@
 from Module.Dataset import Dataset
 from Module.Metrics import MatrixNormDifference, CachedMetric
-from concurrent.futures import ThreadPoolExecutor
-import threading
 from tqdm import tqdm
 
 DATA_DIR = "./cifar-10-batches-py"
