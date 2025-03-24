@@ -17,6 +17,13 @@
             "request": "launch",
             "program": "${workspaceFolder}/VisualizeMetricRoutine.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Distace Comp",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/CachePrecomputeRoutine.py",
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -2,5 +2,6 @@ torch
 numpy
 opencv-python
 matplotlib
+tqdm
 
 PyQt5
