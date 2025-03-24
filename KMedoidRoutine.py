@@ -1,4 +1,6 @@
 import random
+import torch
+import matplotlib.pyplot as plt
 from Module.Dataset import Dataset
 from Module.Metrics import IImageMetric, MatrixNormDifference, CachedMetric
 
@@ -61,9 +63,31 @@ class KMedoidRoutine:
             clusters[closest_medoid].append(img)
         return clusters
 
+    def VisualizeClusters(self):
+        """Visualize medoids and their closest 3 images."""
+        clusters = self.GetClusters()
+        fig, axes = plt.subplots(K, 4, figsize=(12, 12))
+        
+        for i, (medoid, images) in enumerate(clusters.items()):
+            # Plot the medoid
+            ax = axes[i, 0]
+            ax.imshow(medoid.permute(1, 2, 0).numpy())  # Convert to HWC format for matplotlib
+            ax.set_title(f"Medoid {i + 1}")
+            ax.axis('off')
+            
+            # Plot the 3 closest images
+            closest_images = sorted(images, key=lambda img: self.metric.Calculate(medoid, img))[:3]
+            for j, img in enumerate(closest_images):
+                ax = axes[i, j + 1]
+                ax.imshow(img.permute(1, 2, 0).numpy())
+                ax.axis('off')
+
+        plt.tight_layout()
+        plt.show()
+
 
 if __name__ == "__main__":
-    dataset = Dataset(DATA_DIR,trimFirst=100)
+    dataset = Dataset(DATA_DIR, trimFirst=100)
     dataset.Load()
 
     metric = MatrixNormDifference(normType="frobenius")
@@ -73,6 +97,9 @@ if __name__ == "__main__":
     # Run K-Medoid Clustering
     kmedoid = KMedoidRoutine(dataset, metricCache)
     kmedoid.Run()
+
+    # Visualize the medoids and their 3 closest images
+    kmedoid.VisualizeClusters()
 
     clusters = kmedoid.GetClusters()
     print(f"Generated {len(clusters)} clusters.")
