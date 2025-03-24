@@ -81,6 +81,9 @@ class KMedoidRoutine:
                 ax = axes[i, j + 1]
                 ax.imshow(img.permute(1, 2, 0).numpy())
                 ax.axis('off')
+            axes[i, 1].set_title("Closest")
+            axes[i, 2].set_title("Closest")
+            axes[i, 3].set_title("Closest")
             
             # Plot the 3 farthest images
             farthest_images = sorted(images, key=lambda img: self.metric.Calculate(medoid, img), reverse=True)[:3]
@@ -88,6 +91,9 @@ class KMedoidRoutine:
                 ax = axes[i, j + 4]
                 ax.imshow(img.permute(1, 2, 0).numpy())
                 ax.axis('off')
+            axes[i, 4].set_title("Farthest")
+            axes[i, 5].set_title("Farthest")
+            axes[i, 6].set_title("Farthest")
 
         plt.tight_layout()
         plt.show()
