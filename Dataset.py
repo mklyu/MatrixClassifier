@@ -6,11 +6,11 @@ import torch
 from torch.utils.data import Dataset
 
 
-class CIFAR10Dataset(Dataset):
-    def __init__(self, filedir: str):
-        assert isinstance(filedir, str)
+class Dataset(Dataset):
+    def __init__(self, dataDir: str):
+        assert isinstance(dataDir, str)
 
-        self.filedir = filedir
+        self.dataDir = dataDir
 
         self._data: List = []
         self._labels: List = []
@@ -19,9 +19,12 @@ class CIFAR10Dataset(Dataset):
         data = []
         labels = []
 
-        for file in os.listdir(self.filedir):
+        if not os.path.isdir(self.dataDir):
+            raise FileNotFoundError(f"Folder {self.dataDir} not found")
+
+        for file in os.listdir(self.dataDir):
             if file.startswith("data_batch") or file.startswith("test_batch"):
-                batch = self._Unpickle(os.path.join(self.filedir, file))
+                batch = self._Unpickle(os.path.join(self.dataDir, file))
                 data.extend(batch[b"data"])
                 labels.extend(batch[b"labels"])
 
@@ -30,7 +33,7 @@ class CIFAR10Dataset(Dataset):
         )
         self._labels = torch.tensor(labels, dtype=torch.long)
 
-    def _Unpickle(file):
+    def _Unpickle(self,file):
         with open(file, "rb") as fo:
             data = pickle.load(fo, encoding="bytes")
         return data
