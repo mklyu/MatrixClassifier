@@ -13,30 +13,44 @@ class CachedMetric(IImageMetric):
 
     def Calculate(self, img1, img2, idx1=None, idx2=None):
         """
-        Computes or retrieves cached distance.
+        Computes the distance between two images (no caching).
 
         Args:
             img1, img2: Image tensors.
             idx1, idx2: Optional dataset indices for caching.
 
         Returns:
-            Cached or computed distance.
+            Computed distance.
         """
-        # Ensure that the indices are order-independent for the cache
-        if idx1 is not None and idx2 is not None:
-            # Using sorted indices to ensure the key order does not matter
-            key = tuple(sorted((idx1, idx2)))  # Same key for both (idx1, idx2) and (idx2, idx1)
-            if key in self.cache:
-                return self.cache[key]
+        # Compute distance without using cache
+        return self.metric.Calculate(img1, img2)
 
-        # Compute distance if not cached
-        distance = self.metric.Calculate(img1, img2)
+    def ComputeAndCache(self, img1, img2, idx1, idx2):
+        """
+        Computes the distance and caches it.
 
-        # Store in cache if indices provided
-        if idx1 is not None and idx2 is not None:
-            self.cache[key] = distance
+        Args:
+            img1, img2: Image tensors.
+            idx1, idx2: Indices for caching the distance.
 
+        Returns:
+            The computed distance after caching.
+        """
+        distance = self.Calculate(img1, img2, idx1, idx2)  # Compute the distance
+        self.Cache(distance, idx1, idx2)  # Cache the computed distance
         return distance
+
+    def Cache(self, distance, idx1, idx2):
+        """
+        Directly caches the given distance with the provided indices.
+
+        Args:
+            distance: The computed distance between two images.
+            idx1, idx2: Indices for caching the distance.
+        """
+        # Ensure the cache key order is independent of the indices' order
+        key = tuple(sorted((idx1, idx2)))
+        self.cache[key] = distance
 
     def ToPickle(self, file_path):
         """Saves the cached distances to a file."""
@@ -47,3 +61,7 @@ class CachedMetric(IImageMetric):
         """Loads cached distances from a file."""
         with open(file_path, "rb") as f:
             self.cache = pickle.load(f)
+
+    def CacheContent(self):
+        """Returns the current cache."""
+        return self.cache
