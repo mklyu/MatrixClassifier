@@ -104,7 +104,7 @@ class KMedoidRoutine:
 
 
 if __name__ == "__main__":
-    dataset = Dataset(DATA_DIR, trimFirst=10)
+    dataset = Dataset(DATA_DIR, trimFirst=1000)
     dataset.Load()
 
     metric = MatrixNormDifference(normType="frobenius")
