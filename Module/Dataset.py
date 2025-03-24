@@ -2,6 +2,7 @@ import os
 from typing import List
 import pickle
 
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 
@@ -28,6 +29,9 @@ class Dataset(Dataset):
                 batch = self._Unpickle(os.path.join(self.dataDir, file))
                 data.extend(batch[b"data"])
                 labels.extend(batch[b"labels"])
+
+        # shortens torch load
+        data = np.array(data)
 
         self._data = (
             torch.tensor(data, dtype=torch.float32).reshape(-1, 3, 32, 32) / 255.0

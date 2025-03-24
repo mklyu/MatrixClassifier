@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from Dataset import Dataset
+from Module.Dataset import Dataset
 
 DATA_DIR = "./cifar-10-batches-py"
 
@@ -27,7 +27,10 @@ class VisualizerRoutine:
 
 
 if __name__ == "__main__":
+    print(f"Datadir {DATA_DIR}")
     dataset = Dataset(DATA_DIR)
+    print(f"Loading..")
     dataset.Load()
+    print(f"Press any key to cycle images <<<")
     visualizer = VisualizerRoutine(dataset)
     visualizer.Run()
